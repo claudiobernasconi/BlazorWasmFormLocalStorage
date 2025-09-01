@@ -1,5 +1,7 @@
 ﻿@page "/contact"
 @using System.ComponentModel.DataAnnotations
+@using System.Text.Json
+@inject IJSRuntime JS
 
 <PageTitle>Contact</PageTitle>
 
@@ -12,7 +14,7 @@
     <div class="mb-3">
         <label for="name" class="form-label">Name</label>
         <InputText id="name" class="form-control" Value="@Model.Name"
-                   ValueChanged="@(value => OnFieldChanged(nameof(Model.Name), value))"
+                   ValueChanged="@(async value => await OnFieldChanged(nameof(Model.Name), value))"
                    ValueExpression="@(() => Model.Name)" />
         <ValidationMessage For="@(() => Model.Name)" />
     </div>
@@ -48,6 +50,15 @@
 @code {
     private ContactModel Model = new ContactModel();
     private bool isSubmitted = false;
+    private const string StorageKey = "ContactForm";
+
+    protected async override Task OnInitializedAsync()
+    {
+        Console.WriteLine("OnInitializedAsync");
+        Model = await LoadItem<ContactModel>(StorageKey) ?? new ContactModel();
+
+        await base.OnInitializedAsync();
+    }
 
     private void HandleValidSubmit()
     {
@@ -71,7 +82,7 @@
         public string Message { get; set; } = string.Empty;
     }
 
-    private void OnFieldChanged(string fieldName, object? newValue)
+    private async Task OnFieldChanged(string fieldName, object? newValue)
     {
         if (fieldName == nameof(Model.Name))
         {
@@ -89,6 +100,28 @@
         {
             Model.Message = newValue?.ToString() ?? string.Empty;
         }
+
+        await StoreItem(StorageKey, Model);
+    }
+
+    public ValueTask StoreItem(string key, object data)
+    {
+        return JS.InvokeVoidAsync("localStorage.setItem", new object[]
+        {
+            key,
+            JsonSerializer.Serialize(data)
+        });
+    }
+
+    public async Task<T?> LoadItem<T>(string key)
+    {
+        var data = await JS.InvokeAsync<string>("localStorage.getItem", key);
+        if (!string.IsNullOrEmpty(data))
+        {
+            return JsonSerializer.Deserialize<T>(data);
+        }
+
+        return default;
     }
 }
 
