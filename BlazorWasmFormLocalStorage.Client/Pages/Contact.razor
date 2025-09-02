@@ -13,27 +13,37 @@
 
     <div class="mb-3">
         <label for="name" class="form-label">Name</label>
-        <InputText id="name" class="form-control" Value="@Model.Name"
-                   ValueChanged="@(async value => await OnFieldChanged(nameof(Model.Name), value))"
-                   ValueExpression="@(() => Model.Name)" />
+        <InputText id="name" class="form-control" 
+                    Value="@Model.Name"
+                    ValueChanged="@(async value => await OnFieldChanged(nameof(Model.Name), value))"
+                    ValueExpression="@(() => Model.Name)" />
         <ValidationMessage For="@(() => Model.Name)" />
     </div>
 
     <div class="mb-3">
         <label for="email" class="form-label">Email</label>
-        <InputText id="email" type="email" class="form-control" @bind-Value="Model.Email" />
+        <InputText id="email" type="email" class="form-control" 
+                    Value="@Model.Email"
+                    ValueChanged="@(async value => await OnFieldChanged(nameof(Model.Email), value))"
+                    ValueExpression="@(() => Model.Email)" />
         <ValidationMessage For="@(() => Model.Email)" />
     </div>
 
     <div class="mb-3">
         <label for="subject" class="form-label">Subject</label>
-        <InputText id="subject" class="form-control" @bind-Value="Model.Subject" />
+        <InputText id="subject" class="form-control" 
+                    Value="@Model.Subject"
+                    ValueChanged="@(async value => await OnFieldChanged(nameof(Model.Subject), value))"
+                    ValueExpression="@(() => Model.Subject)" />
         <ValidationMessage For="@(() => Model.Subject)" />
     </div>
 
     <div class="mb-3">
         <label for="message" class="form-label">Message</label>
-        <InputTextArea id="message" class="form-control" Rows="5" @bind-Value="Model.Message" />
+        <InputTextArea id="message" class="form-control" Rows="5" 
+                    Value="@Model.Message"
+                    ValueChanged="@(async value => await OnFieldChanged(nameof(Model.Message), value))"
+                    ValueExpression="@(() => Model.Message)" />
         <ValidationMessage For="@(() => Model.Message)" />
     </div>
 
@@ -54,10 +64,7 @@
 
     protected async override Task OnInitializedAsync()
     {
-        Console.WriteLine("OnInitializedAsync");
         Model = await LoadItem<ContactModel>(StorageKey) ?? new ContactModel();
-
-        await base.OnInitializedAsync();
     }
 
     private void HandleValidSubmit()
